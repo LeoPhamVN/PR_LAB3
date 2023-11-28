@@ -2,6 +2,7 @@ from Localization import Localization
 from ParticleFilter import ParticleFilter
 import matplotlib.pyplot as plt
 import numpy as np
+from Pose3D import *
 class MCLocalization(ParticleFilter):
     """
     Monte Carlo Localization class.
@@ -31,6 +32,10 @@ class MCLocalization(ParticleFilter):
         child classes can overwrite the MotionModel method to implement their own motion model.
         """
         # **To be completed by the student**.
+        # create array of n_particles particleRsks distributed randomly around u with covariance Q
+        # Get number of particles
+
+        self.MotionModel(u, Q)
 
     def Localize(self):
         """
@@ -62,8 +67,10 @@ class MCLocalization(ParticleFilter):
             self.xk = self.Localize()  # Localize the robot
 
             xsk_1 = xsk  # current state becomes previous state for next iteration
+            
+            self.xk_1 = xsk[0:3]
 
-            self.PlotTrajectory()  # plot the estimated trajectory
+            # self.PlotTrajectory()  # plot the estimated trajectory
 
         plt.show()
         return

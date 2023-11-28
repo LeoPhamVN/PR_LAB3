@@ -22,12 +22,50 @@ class PF_3DOF_DR(MCLocalization):
         """
 
         # **To be completed by the student**.
-        pass
+        """
+        Get the input for the motion model. In this case, the input is the readings from both wheel encoders.
+
+        :return: uk:  input vector (:math:`u_k=[n_L~n_R]^T`)
+        """
+
+        # TODO: to be completed by the student
+        # Get output of encoder via ReadEncoder() function
+        uk_pulse, _     = self.robot.ReadEncoders()
+        
+        # Compute travel distance of 2 wheels [meter] from output of the encoder
+        d_L     = uk_pulse[0, 0] * (2*np.pi*self.wheelRadius/self.robot.pulse_x_wheelTurns)
+        d_R     = uk_pulse[1, 0] * (2*np.pi*self.wheelRadius/self.robot.pulse_x_wheelTurns)
+
+        # Compute travel distance of the center point of robot between k-1 and k
+        d       = (d_L + d_R) / 2.
+        # Compute rotated angle of robot around the center point between k-1 and k
+        delta_theta_k   = np.arctan2(d_R - d_L, self.wheelBase)
+
+        # Compute xk from xk_1 and the travel distance and rotated angle. Got the equations from chapter 1.4.1: Odometry 
+        uk              = np.array([[d],
+                                    [0],
+                                    [delta_theta_k]])
+        
+        Rsk = np.diag(np.array([0.5 ** 2, 0.5 ** 2, np.deg2rad(5) ** 2]))  # covariance of simulated displacement noise
+
+        return uk, Rsk 
+
     
     
-    def MotionModel(self, particle, u, noise):
+    def MotionModel(self, u, noise):
         # **To be completed by the student**.
-        pass
+        # create array of n_particles particle Rsks distributed randomly around u with covariance Q
+        # Get number of particles
+        n_particles = len(self.particles)
+
+        # Init particle u
+        particles_u = np.zeros((n_particles,3))
+        for i in range(n_particles):
+            # Add noise to the u particle
+            particles_u[i,0:3] = u.T + np.random.normal(0.0, np.diag(noise))
+            # Motion model
+            self.particles[i,0:3] = Pose3D.oplus(self.particles[i,0:3].reshape((3,1)), particles_u[i,0:3].reshape((3,1))).reshape((1,3))
+
     
 
 
@@ -52,7 +90,9 @@ if __name__ == '__main__':
     n_particles = 50
 
     #create array of n_particles particles distributed randomly around x0 with covariance P
-
+    particles = np.zeros((n_particles,3))
+    for i in range(n_particles):
+        particles[i,:] = x0.T + np.random.normal(0.0, np.diag(P0))
     #
     # **To be completed by the student**.
     #

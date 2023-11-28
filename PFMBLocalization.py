@@ -72,7 +72,7 @@ class PFMBL(MCLocalization):
     
 
     def Localize(self):
-        uk, Qk = self.GetInput()
+        uk, Qk =  self.GetInput()
 
         if uk.size > 0:
             self.Prediction(uk, Qk)

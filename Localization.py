@@ -41,6 +41,17 @@ class Localization:
         Gets the input from the robot. To be overidden by the child class.
 
         :return uk: input variable
+
+        """
+        pass
+
+    def GetMeasurements(self):
+        """
+        Read the measurements from the robot. Returns a vector of range distances to the map features.
+        Only those features that are within the :attr:`SimulatedRobot.SimulatedRobot.Distance_max_range` of the sensor are returned.
+        The measurements arribe at a frequency defined in the :attr:`SimulatedRobot.SimulatedRobot.Distance_feature_reading_frequency` attribute.
+
+        :return: vector of distances to the map features, covariance of the measurement noise
         """
         pass
 

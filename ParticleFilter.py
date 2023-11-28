@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from Localization import Localization
+from Pose3D import *
 
 class ParticleFilter(Localization):
     """
