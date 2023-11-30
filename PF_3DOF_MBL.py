@@ -47,7 +47,7 @@ class PF_3DOF_MBL(PFMBL):
                                     [0],
                                     [delta_theta_k]])
         
-        Rsk = np.diag(np.array([0.5 ** 2, 0.5 ** 2, np.deg2rad(5) ** 2]))  # covariance of simulated displacement noise
+        Rsk = np.diag(np.array([0.05 ** 2, 0.05 ** 2, np.deg2rad(1) ** 2]))  # covariance of simulated displacement noise
 
         return uk, Rsk 
     
@@ -76,7 +76,7 @@ class PF_3DOF_MBL(PFMBL):
         particles_u = np.zeros((n_particles,3))
         for i in range(n_particles):
             # Add noise to the u particle
-            particles_u[i,0:3] = u.T + np.random.normal(0.0, np.diag(noise))
+            particles_u[i,0:3] = u.T + np.random.normal(0.0, np.sqrt(np.diag(noise)))
             # Motion model
             self.particles[i,0:3] = Pose3D.oplus(self.particles[i,0:3].reshape((3,1)), particles_u[i,0:3].reshape((3,1))).reshape((1,3))
     
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     #create array of n_particles particles distributed randomly around x0 with covariance P
     particles = np.zeros((n_particles,3))
     for i in range(n_particles):
-        particles[i,:] = x0.T + np.random.normal(0.0, np.diag(P0))
+        particles[i,:] = x0.T + np.random.normal(0.0, np.sqrt(np.diag(P0)))
     #
     # **To be completed by the student**.
     #

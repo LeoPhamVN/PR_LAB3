@@ -1,6 +1,8 @@
 import numpy as np
 import math
 from MCLocalization import MCLocalization
+import random as rnd
+import time
 
 class PFMBL(MCLocalization):
     """
@@ -29,9 +31,26 @@ class PFMBL(MCLocalization):
         :return: None
         """
         # To be completed by the student
-        return
-    
-    
+        n_particles = len(self.particles)
+        n_M         = len(self.M)
+
+        # self.particle_weights = self.particle_weights + 0.02 # evenly distributed weights
+        if R == 0:
+            print("Standard deviation of the measurement equals to 0, pls change it")
+
+        for inx_particles in range(n_particles):
+            for inx_M in range(n_M):
+                # Compute distance between one particle to one landmark
+                dist_particle_M = np.linalg.norm(self.particles[inx_particles,:2] - self.M[inx_M].T)
+                # Compute error between distance above with the measurement
+                err = dist_particle_M - z[inx_M]
+                # Compute the probability P(z|x) with Gaussian distribution
+                pz =  1 / np.sqrt(2*np.pi*R) * np.exp(-(err)**2 / (2 * R))
+                # Update the weight of particle
+                self.particle_weights[inx_particles] *= pz
+            # Normalise weights of all particles
+            self.particle_weights /= np.sum(self.particle_weights) 
+
     def Resample(self):
         """
         Resample the particles based on their weights to ensure diversity and prevent particle degeneracy.
@@ -49,8 +68,33 @@ class PFMBL(MCLocalization):
         :return: None
         """
         # To be completed by the student
-        return
-    
+        # Using Low_variance_sampler
+
+        # Sum all particle weights
+        W = np.sum(self.particle_weights)
+        # Get number of particles weights
+        M = len(self.particle_weights)
+        # Compute r and initialize c, i value of the Low veriance sampler
+        r = W/M * rnd.random()
+        c = self.particle_weights[0]
+        i = 0
+        # Initilize resampled particles
+        particles_resampled = np.zeros((len(self.particles),3))
+
+        # Loop
+        for i_M in range(M):
+            u = r + i_M * W/M
+            while u > c:
+                i += 1
+                c += self.particle_weights[i]   
+
+            particles_resampled[i_M] = self.particles[i]
+
+        # Assign resampled particles to particles
+        self.particles = particles_resampled
+        # Assign all weights of particles equal to 1/M
+        self.particle_weights = np.ones(len(self.particles)) / len(self.particles)
+
     def Update(self, z, R):
         """
         Update the particle weights based on sensor measurements and perform resampling.
@@ -67,10 +111,13 @@ class PFMBL(MCLocalization):
         :param R: the covariance matrix associated with the measurement vector
 
         """
-        # To be completed by the student
-        return
-    
-
+        # To be completed by the student      
+        N_eff = 1 / np.sum(np.square(self.particle_weights))
+        if N_eff < len(self.particle_weights)/2:
+            self.Resample()
+        else:
+            self.Weight(z, R)
+            
     def Localize(self):
         uk, Qk =  self.GetInput()
 

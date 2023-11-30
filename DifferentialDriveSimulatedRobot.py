@@ -202,8 +202,9 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
             ranges = np.append(ranges, range_i)
 
         ranges = ranges.reshape((len(self.M),1))
+
         # Compute convariance matrix of Yaw
-        R_ranges  = 1.5
+        R_ranges  = 4.0**2
 
         return ranges, R_ranges
 

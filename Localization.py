@@ -121,7 +121,7 @@ class Localization:
         """
         xk = self.xk
         if self.k % self.robot.visualizationInterval == 0:
-            self.xTraj.append(xk[0, 0])
-            self.yTraj.append(xk[1, 0])
+            self.xTraj.append(xk[0])
+            self.yTraj.append(xk[1])
             self.trajectory.pop(0).remove()
             self.trajectory = plt.plot(self.xTraj, self.yTraj, marker='.', color='blue', markersize=1)

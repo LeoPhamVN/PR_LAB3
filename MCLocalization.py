@@ -70,7 +70,7 @@ class MCLocalization(ParticleFilter):
             
             self.xk_1 = xsk[0:3]
 
-            # self.PlotTrajectory()  # plot the estimated trajectory
+            self.PlotTrajectory()  # plot the estimated trajectory
 
         plt.show()
         return
